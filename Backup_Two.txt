@@ -1,0 +1,53 @@
+/******************************************************************************
+
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <string>
+#include <cstring>
+#include <stdio.h>
+
+using namespace std;
+
+int main()
+{
+    //Random Generator
+    srand(time(NULL));
+    
+    //Range of the possible size for each Document
+    int memoryRange;
+    
+    //Alphabet Storage
+    char alphabet[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O','P', 'Q', 'R', 'S', 'T', 'U','V', 'W', 'X',
+        'Y', 'Z'
+    };
+    
+    //Recent_List
+    int recent_listSize = 127;
+    char **recent_list;
+    recent_list = new char*[recent_listSize];
+    for(int i = 0 ; i < recent_listSize; i++){
+        //Randomly Generate Size of Document (2MB - 3MB)
+        memoryRange = rand() % 3000000 + 2000000;
+        //Creates a Char Array of memoryRange Size
+        recent_list[i] = new char[memoryRange];
+        
+        //Populate the Current Char Array with Random Letters
+        for(int j = 0 ; j < memoryRange; j++){
+            //Randomly Generate Index (0 - 25)
+            int randIndex = rand() % 26;
+            recent_list[i][j] = alphabet[randIndex];
+        }
+        
+        cout << "#" << i << " " << recent_list[i] << endl;
+        
+    }
+  
+    return 0;
+}
