@@ -3,8 +3,20 @@
 #include <time.h>
 #include <string.h>
 #include <stdio.h>
+#include <list>
+#include <queue>
 
 using namespace std;
+
+int printOptions(){
+    cout << "1. FIRST\n2. CPP\n3. REVIEW\n4. PROGRAM\n5. ASSIGNMENT\n6. CECS\n7. BEACH\n8. ECS\n9. FALL\n10. SPRING\n11. OS\n12. MAC\n13. LINUX\n14. WINDOWS\n15. LAB\n0. Exit" << endl;
+    cout << "Choice: ";
+
+    int choice;
+    cin >> choice;
+
+    return choice;
+}
 
 int main()
 {
@@ -24,79 +36,110 @@ int main()
     "ASSIGNMENT", "CECS", "BEACH", "ECS", "FALL", "SPRING", "OS",
     "MAC", "LINUX", "WINDOWS", "LAB"};
 
-    //Recent_List
+    //Initializing Recent_List (Linked List)
     int recent_listSize = 127;
-    char **recent_list;
-    recent_list = new char*[recent_listSize];
-    for(int i = 0 ; i < recent_listSize; i++){
-        //Randomly Generate Size of Document (2MB - 3MB)
-        memoryRange = rand() % 3000000 + 2000000;
-        //Creates a Char Array of memoryRange Size
-        recent_list[i] = new char[memoryRange];
+    list<char *> recent_list;
 
-        string document = "";
-        //Populate the Current Char Array with Random Letters
-        for(int j = 0 ; j < memoryRange; j++){
-            //Randomly Generate Index (0 - 25)
+    for(int i = 0; i < recent_listSize; i++){
+        //Generate Memory Range for Each Document
+        int memoryRange = rand() % 300000 + 200000;
+
+        //Generate Document
+        char *ptr = new char[memoryRange];
+
+        //Populate Document with Random Letters
+        for(int j = 0; j < memoryRange; j++){
+            //Generates Random Index Number Referenced to Dictionary Char Array
             int randIndex = rand() % 26;
 
-            //Store Random Alphabets (A - Z) into each index of the current document
-//            recent_list[i][j] = alphabet[randIndex];
-            document += alphabet[randIndex];
+            //Store Random Letter into current Index
+            ptr[j] = alphabet[randIndex];
         }
-        strcpy(recent_list[i], document.c_str());
+        //Stores Document on to List (Order does not matter for recent_list)
+        recent_list.push_front(ptr);
     }
 
-    //Library
+
+    //Initializing Library (Vector)
     int library_size = 1027;
-    char **library;
-    library = new char*[library_size];
-    for(int i = 0 ; i < library_size; i++){
-        //Randomly Generate Size of Document (2MB - 3MB)
-        memoryRange = rand() % 3000000 + 2000000;
-        //Creates a Char Array of memoryRange Size
-        library[i] = new char[memoryRange];
+    queue<char *> library;
 
-        string document = "";
+    for(int i = 0; i < library_size; i++){
+        //Generate Memory Range for Each Document
+        int memoryRange = rand() % 300000 + 200000;
 
-        //Populate the Current Char Array with Random Letters
-        for(int j = 0 ; j < memoryRange; j++){
-            //Randomly Generate Index (0 - 25)
+        //Generate Document
+        char *ptr = new char[memoryRange];
+
+        //Populate Document with Random Letters
+        for(int j = 0; j < memoryRange; j++){
+            //Generates Random Index Number Referenced to Dictionary Char Array
             int randIndex = rand() % 26;
 
-            //Store Random Alphabets (A - Z) into each index of the current document
-//            library[i][j] = alphabet[randIndex];
-            document += alphabet[randIndex];
+            //Store Random Letter into current Index
+            ptr[j] = alphabet[randIndex];
         }
-        strcpy(library[i], document.c_str());
+
+        //Stores Document on to List to the bottom of the library
+        library.push(ptr);
     }
 
-//    int countDocument = 0;
-//    char *ptr = NULL;
-//    int randIndex = rand() % 15;
-//    char *word = new char[100];
-//    word = dictionary[randIndex];
-//
-//    for(int i = 0; i < recent_listSize; i++){
-//        ptr = strstr(recent_list[i], word);
-//        if(ptr){
-//            countDocument++;
-//        }
-//    }
-//    cout << "Count Document: " << countDocument << endl;
 
+    //User Input
+    int userChoice = 0;
+    do{
+        int numOfDocsDeleted = 0;                                        //Used to figure out how much documents to transfer from library, and how many new documents to add to library (after transfer)
+        userChoice = printOptions();
 
-    //Deleting recent_list documents
-    for(int i = 0 ; i < recent_listSize; i++){
-        delete [] recent_list[i];
-    }
-    delete[] recent_list;
+        if(userChoice == 0) //User Exit
+            break;
+        else{
+            //Search Keyword in recent_list documents
+            char *word = new char[20];
+            word = dictionary[userChoice - 1];
+            for(list<char *>::iterator recent_listIterator = recent_list.begin(); recent_listIterator != recent_list.end(); recent_listIterator++){
+                //Use an iterator to go through the list of documents
 
-    //Deleting library documents
-    for(int i = 0; i < library_size; i++){
-        delete [] library[i];
-    }
-    delete [] library;
+                //Search Keyword in Documents
+                char *output = NULL;
+                output = strstr(*recent_listIterator, word);
+
+                //If the word does not exist in the current document, then delete and update recent_list
+                if(!output){
+                    //Delete the Node and Update
+                    recent_listIterator = recent_list.erase(recent_listIterator);
+
+                    //Counter
+                    numOfDocsDeleted++;
+                }
+            }
+
+            //Transfer (if any) documents to the recent_list from library
+            for(int i = 0; i < numOfDocsDeleted; i++){
+                //Copies value from current value of libraryIterator
+                recent_list.push_back(library.front());
+
+                //Deletes the Document from library
+                library.pop();
+
+                //Add the new initialized Document to the Library
+                int memoryRange = rand() % 300000 + 200000;
+                char *ptr = new char[memoryRange];
+                for(int j = 0; j < memoryRange; j++){
+                    int randIndex = rand() % 26;
+                    ptr[j] = alphabet[randIndex];
+                }
+                library.push(ptr);
+            }
+
+            //Display Output
+            cout << "====================================================" << endl;
+            cout << "Keyword: " << word << endl;
+            cout << numOfDocsDeleted << " documents ejected and reinitialized" << endl;
+            cout << "====================================================" << endl;
+        }
+    }while(userChoice != 0);
+
 
     return 0;
 }
